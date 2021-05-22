@@ -1,1 +1,199 @@
+//AVR CODE FOR MENU DISLAY
+/*
+ * lab_project.c
+ *
+ * Created: 17-May-21 3:37:18 PM
+ * Author : hp
+ */ 
+ 
+#define F_CPU 8000000UL			// Define CPU Frequency (8MHz) 
+#include <avr/io.h>			
+#include <util/delay.h>			// inbuilt defined Delay header file 
+
+void cmd_enable(){
+	PORTC &= ~(1<<PORTC0);		//make RS =0 for command register
+	PORTC |= (1<<PORTC2);		//make enable=1 as HIGH
+	_delay_ms(20);
+	PORTC &= ~(1<<PORTC2);		//make Enable=0 as LOW
+	_delay_ms(30);
+}
+
+void data_enable(){
+	PORTC |= (1<<PORTC0);		//make RS =1 for data register
+	PORTC |= (1<<PORTC2);		//make enable=1 as HIGH
+	_delay_ms(20);
+	PORTC &= ~(1<<PORTC2);		//make Enable=0 as LOW
+	_delay_ms(30);
+}
+
+void data_str(char *str){		//print words on the screen
+	int i;
+	for (i=0; str[i]!=0;i++){
+		PORTB= str[i];
+		data_enable();
+	}
+}
+
+int Menu =1;
+
+void updateMenu(){
+	switch(Menu){
+		case 0:
+			Menu = 1;
+			break;
+		case 1:							//initial display state
+			PORTB = 0x01;
+			cmd_enable();
+			data_str(">> Date & Time");
+			cmd_enable();
+			PORTB = 0xC0;				//move the cursor to 2nd row
+			cmd_enable();
+			data_str(" > Settings");
+			break;
+		case 2:							//2nd display state
+			PORTB = 0x01;
+			cmd_enable();
+			data_str(" > Date & Time");
+			cmd_enable();
+			PORTB = 0xC0;				//move the cursor to 2nd row
+			cmd_enable();
+			data_str(">> Settings");
+			break;
+		case 3:							//Third display state
+			PORTB = 0x01;
+			cmd_enable();
+			data_str(">> Set Alarm");
+			cmd_enable();
+			PORTB = 0xC0;				//move the cursor to 2nd row
+			cmd_enable();
+			data_str(" > Alarm Ringtone");
+			break;
+		case 4:							//fourth display state
+			PORTB = 0x01;
+			cmd_enable();
+			data_str(" > Set Alarm");
+			cmd_enable();
+			PORTB = 0xC0;				//move the cursor to 2nd row
+			cmd_enable();
+			data_str(">> Alarm Ringtone");
+			break;
+		case 5:
+			Menu = 4;
+			break;
+	}
+}
+
+void Action1(){
+	PORTB = 0x01;
+	cmd_enable();	
+	data_str("<2021-05-21>");
+	cmd_enable();
+	PORTB = 0xC0;				//move the cursor to 2nd row
+	cmd_enable();
+	data_str("<00:00:00>");
+	_delay_ms(3000);
+	
+}
+
+void Action2(){
+	PORTB = 0x01;
+	cmd_enable();
+	data_str("Set Date");
+	cmd_enable();
+	PORTB = 0xC0;				//move the cursor to 2nd row
+	cmd_enable();
+	data_str("Set Time");
+	_delay_ms(3000);
+}
+
+void Action3(){
+	PORTB = 0x01;
+	cmd_enable();
+	data_str("Alarm time");
+	cmd_enable();
+	PORTB = 0xC0;				//move the cursor to 2nd row
+	cmd_enable();
+	data_str("Alarm Date");
+	_delay_ms(3000);
+}
+
+void Action4(){
+	PORTB = 0x01;
+	cmd_enable();
+	data_str("<Tone 1>");
+	cmd_enable();
+	PORTB = 0xC0;				//move the cursor to 2nd row
+	cmd_enable();
+	data_str("<Tone 2>");
+	_delay_ms(3000);
+}
+
+void executeAction(){			//move to actions when select an option in each case
+	switch (Menu) {
+		case 1:
+			Action1();
+			break;
+		case 2:
+			Action2();
+			break;
+		case 3:
+			Action3();
+			break;
+		case 4:
+			Action4();
+			break;
+	}
+}		
+
+void main(){
+	DDRB = 0b11111111;			//=255 =0xFF (portB all pins :output)
+	DDRC |= (1<<DDC2);			//RS
+	DDRC |= (1<<DDC0);			//En
+	_delay_ms(100);
+	
+	PORTB = 0x38;				//initiate the LCD(8 bit mode)
+	cmd_enable();
+	PORTB = 0x0E;				//Display ON , cursor ON
+	cmd_enable();
+	PORTB = 0x01;				//clear display
+	cmd_enable();
+	PORTB = 0x80;				//bring cursor to home position
+	cmd_enable();
+	
+	data_str("WELCOME");
+	cmd_enable();
+	PORTB = 0xC0;				//move the cursor to 2nd row
+	cmd_enable();
+	data_str("MENU");
+	_delay_ms(4000);
+	PORTB = 0x01;
+	cmd_enable();
+							//after delay of welcome screen, showing menu options
+	updateMenu();
+	//data_str(">> Date & Time");
+	//cmd_enable();
+	//PORTB = 0xC0;				//move the cursor to 2nd row
+	//cmd_enable();
+	//data_str(" > Settings");
+	//PORTB = 0x0C;				//cursor off
+	
+	while(1){
+		if (PINC & (1<<PINC3)){			//take input from 'down' button (to portC pin3)
+			Menu++;
+			updateMenu();		//update the display according to the button pressing
+			_delay_ms(1000);
+		}
+		else if (PINC & (1<<PINC4)){	//take input from 'up' button (to portC pin4)
+			Menu--;
+			updateMenu();
+			_delay_ms(1000);
+		}
+		else if (PINC & (1<<PINC5)){	//take input from 'select' button (to portC pin5)
+			executeAction();	//goes to the actions according to the selected option
+			updateMenu();
+			_delay_ms(1000);
+		}
+		//return 0;
+	}
+}
 
