@@ -67,9 +67,7 @@ int got_melody[] = {
 
 int got_notes = sizeof(got_melody) / sizeof(got_melody[0]) / 2;
 
-int wholenote = (60000 * 4) / got_tempo;
 
-int got_divider = 0, got_noteDuration = 0;
 
 
 

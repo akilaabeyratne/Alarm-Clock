@@ -10,7 +10,7 @@
 #define PINKPANTHER_H_
 #define REST      0
 
-int tempo_pink = 120;
+int pink_tempo = 120;
 
 int pink_melody[] = {
 
@@ -40,7 +40,6 @@ int pink_melody[] = {
 };
 
 int pink_notes = sizeof(pink_melody) / sizeof(pink_melody[0]) / 2;
-int pink_wholenote = (60000 * 4) / tempo_pink;
-int pink_divider = 0, pink_noteDuration = 0;
+
 
 #endif /* PINKPANTHER_H_ */

@@ -49,9 +49,6 @@ int god_melody[] = {
 };
 
 int god_notes = sizeof(god_melody) / sizeof(god_melody[0]) / 2;
-int god_wholenote = (60000 * 4) / god_tempo;
-
-int god_divider = 0, god_noteDuration = 0;
 
 
 
