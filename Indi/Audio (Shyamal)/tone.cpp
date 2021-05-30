@@ -4,7 +4,7 @@
  * Created: 5/20/2021 12:32:36 AM
  *  Author: Shyamal
  */ 
-#define F_CPU 8000000UL
+#define F_CPU 16000000UL
 #include <avr/io.h>
 #define __DELAY_BACKWARD_COMPATIBLE__
 #include <util/delay.h>
